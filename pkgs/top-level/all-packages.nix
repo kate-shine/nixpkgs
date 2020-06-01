@@ -21809,6 +21809,8 @@ in
 
   insync = callPackage ../applications/networking/insync { };
 
+  jsonnet-bundler = callPackage ../applications/networking/cluster/jsonnet-bundler { };
+
   libstrangle = callPackage ../tools/X11/libstrangle {
     stdenv = stdenv_32bit;
   };
