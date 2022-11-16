@@ -1,0 +1,36 @@
+From: Jack Baldry <jack.baldry@grafana.com>
+Date: Tue, 15 Nov 2022 16:49:56 -0400
+Subject: [PATCH] Remove include of random_shuffle header
+
+Although this is reportedly removed from
+C++17 (https://github.com/osquery/osquery/pull/6571#discussion_r504006266)
+and this is the default in gcc
+11 (https://gcc.gnu.org/projects/cxx-status.html#cxx17)
+the random_shuffle algorithm is still defined in
+/nix/store/*-gcc-11.3.0/include/c++/11.3.0/bits/stl_algo.h:4568:5.
+
+Signed-off-by: Jack Baldry <jack.baldry@grafana.com>
+---
+ libraries/cmake/source/thrift/CMakeLists.txt | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/libraries/cmake/source/thrift/CMakeLists.txt b/libraries/cmake/source/thrift/CMakeLists.txt
+--- a/libraries/cmake/source/thrift/CMakeLists.txt
++++ b/libraries/cmake/source/thrift/CMakeLists.txt
+@@ -83,13 +83,6 @@ function(thriftMain)
+     "${library_root}/src/thrift/transport/TWebSocketServer.h"
+   )
+ 
+-  if(PLATFORM_POSIX)
+-    set(tsocket_pool_compile_options "-include;random_shuffle.h")
+-
+-  elseif(PLATFORM_WINDOWS)
+-    set(tsocket_pool_compile_options "/FIrandom_shuffle.h")
+-  endif()
+-
+   set_source_files_properties("${library_root}/src/thrift/transport/TSocketPool.cpp" PROPERTIES
+     COMPILE_OPTIONS
+       "${tsocket_pool_compile_options}"
+-- 
+2.38.1
+

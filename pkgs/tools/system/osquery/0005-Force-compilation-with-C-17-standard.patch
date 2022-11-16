@@ -1,0 +1,25 @@
+From 1ad00861409303ac357b0af8bd082fdf2fb4dd6b Mon Sep 17 00:00:00 2001
+From: Jack Baldry <jack.baldry@grafana.com>
+Date: Tue, 15 Nov 2022 19:01:18 -0400
+Subject: [PATCH] Force compilation with C++17 standard
+
+Signed-off-by: Jack Baldry <jack.baldry@grafana.com>
+---
+ CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 225397101..e2c3a3a86 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -170,6 +170,7 @@ function(importLibraries)
+     elseif(TARGET "${library}")
+       add_library("thirdparty_${library}" ALIAS "${library}")
+       add_real_target_dependencies(thirdparty_libraries "thirdparty_${library}")
++      target_compile_features("thirdpart_${library}" PUBLIC cxx_std_17)
+ 
+     # Legacy libraries will just export variables; build a new INTERFACE
+     # target with them
+-- 
+2.38.1
+
