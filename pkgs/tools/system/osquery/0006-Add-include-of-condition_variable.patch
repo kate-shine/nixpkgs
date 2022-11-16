@@ -1,0 +1,25 @@
+From: Jack Baldry <jack.baldry@grafana.com>
+Date: Tue, 15 Nov 2022 22:05:14 -0400
+Subject: [PATCH] Add include of <condition_variable>
+
+Required for std::condition_variable.
+
+Signed-off-by: Jack Baldry <jack.baldry@grafana.com>
+---
+ osquery/core/shutdown.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/osquery/core/shutdown.cpp b/osquery/core/shutdown.cpp
+--- a/osquery/core/shutdown.cpp
++++ b/osquery/core/shutdown.cpp
+@@ -11,6 +11,7 @@
+ #include <osquery/logger/data_logger.h>
+ 
+ #include <atomic>
++#include <condition_variable>
+ #include <mutex>
+ #include <string>
+ 
+-- 
+2.38.1
+
