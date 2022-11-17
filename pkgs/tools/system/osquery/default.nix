@@ -2,28 +2,7 @@
 
 with pkgs;
 let
-  buildStdenv =
-    # Run Build Command(s):/nix/store/25nm17pd42qmyczrkh80ya2hh9jvgp0g-gnumake-4.3/bin/make -f Makefile cmTC_c9e5b/fast && /nix/store/25nm17pd42qmyczrkh80ya2hh9jvgp0g-gnumake-4.3/bin/make  -f CMakeFiles/cmTC_c9e5b.dir/build.make CMakeFiles/cmTC_c9e5b.dir/build
-    # make[1]: Entering directory '/build/source/build/CMakeFiles/CMakeTmp'
-    # Building C object CMakeFiles/cmTC_c9e5b.dir/testCCompiler.c.o
-    # /nix/store/i276imkk9kkv73qs5p4xjipsd8rr6rby-ccache-links-wrapper-/bin/clang    -MD -MT CMakeFiles/cmTC_c9e5b.dir/testCCompiler.c.o -MF CMakeFiles/cmTC_c9e5b.dir/testCCompiler.c.o.d -o CMakeFiles/cmTC_c9e5b.dir/testCCompiler.c.o -c /build/source/build/CMakeFiles/CMakeTmp/testCCompiler.c
-    # Linking C executable cmTC_c9e5b
-    # /nix/store/981zhk10rbx38si8m01xfx5a2iqlincz-cmake-3.24.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c9e5b.dir/link.txt --verbose=1
-    # /nix/store/i276imkk9kkv73qs5p4xjipsd8rr6rby-ccache-links-wrapper-/bin/clang CMakeFiles/cmTC_c9e5b.dir/testCCompiler.c.o -o cmTC_c9e5b 
-    # clang-11: error: no input files
-    # overrideCC stdenv (ccacheWrapper.override {
-    #   cc = clang;
-    #   # sudo mkdir -m0770 -p /var/cache/ccache
-    #   # sudo chown --reference=/nix/store /var/cache/ccache
-    #   # nix.settings.extra-sandbox-paths = [ "/var/cache/ccache" ];
-    #   # programs.ccache.enable = true;
-    #   extraConfig = ''
-    #     export CCACHE_COMPRESS=1
-    #     export CCACHE_DIR=/var/cache/ccache
-    #     export CCACHE_UMASK=007
-    #   '';
-    # });
-    clangStdenv;
+  buildStdenv = overrideCC stdenv llvmPackages.clangUseLLVM;
   opensslArchive =
     let
       # https://github.com/osquery/osquery/blob/master/libraries/cmake/formula/openssl/CMakeLists.txt#L3-L4
@@ -36,8 +15,6 @@ let
     };
 in
 buildStdenv.mkDerivation rec {
-  # /nix/store/pmgnlnbygb95s4zc8sqhknz9sdz934pk-binutils-2.39/bin/ld: cannot find -lc++abi: No such file or directory
-  # /nix/store/pmgnlnbygb95s4zc8sqhknz9sdz934pk-binutils-2.39/bin/ld: cannot find -lc++: No such file or directory
   pname = "osquery";
   version = "5.5.1";
 
@@ -68,8 +45,7 @@ buildStdenv.mkDerivation rec {
     cmake
     git
     python3
-    # https://github.com/osquery/osquery/blob/master/libraries/cmake/formula/openssl/CMakeLists.txt#L43
-    libunwind
+
     # https://github.com/osquery/osquery/blob/master/libraries/cmake/formula/openssl/CMakeLists.txt#L94
     perl
   ];
