@@ -38,7 +38,6 @@ in
 buildStdenv.mkDerivation rec {
   # /nix/store/pmgnlnbygb95s4zc8sqhknz9sdz934pk-binutils-2.39/bin/ld: cannot find -lc++abi: No such file or directory
   # /nix/store/pmgnlnbygb95s4zc8sqhknz9sdz934pk-binutils-2.39/bin/ld: cannot find -lc++: No such file or directory
-  # Unable to include <sys/sysctl.h> in osquery/tables/system/posix/sysctl_utils.h needed by osquery/tables/system/posix/system_controls.cpp
   pname = "osquery";
   version = "5.5.1";
 
@@ -59,6 +58,7 @@ buildStdenv.mkDerivation rec {
     ./0006-Add-include-of-condition_variable.patch
     ./0007-Add-include-of-iomanip.patch
     ./0008-Add-include-of-cstring.patch
+    ./0010-Remove-sysctl_utils-and-system_controls.patch
   ];
 
   nativeBuildInputs = [
