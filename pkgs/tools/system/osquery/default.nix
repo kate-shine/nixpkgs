@@ -46,10 +46,13 @@ buildStdenv.mkDerivation rec {
     perl
   ];
 
+  prePatch = ''
+    substituteInPlace cmake/install_directives.cmake --replace "/control" "control"
+  '';
+
   preConfigure = ''
     find libraries/cmake/source -name 'config.h' -exec sed -i '/#define HAVE_XLOCALE_H 1/d' {} \;
   '';
-
 
   cmakeFlags = [
     "-DOSQUERY_VERSION=${version}"

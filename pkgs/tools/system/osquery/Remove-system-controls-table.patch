@@ -6,10 +6,13 @@ Relies on <sys/sysctl.h> which is not present in glibc since 2.32.
 
 Signed-off-by: Jack Baldry <jack.baldry@grafana.com>
 ---
- osquery/tables/system/CMakeLists.txt |  4 ----
- specs/posix/system_controls.table    | 21 ---------------------
- 2 files changed, 25 deletions(-)
+ osquery/tables/system/CMakeLists.txt         |  4 --
+ specs/CMakeLists.txt                         |  1 -
+ specs/posix/system_controls.table            | 21 -------
+ tests/integration/tables/system_controls.cpp | 61 --------------------
+ 4 files changed, 87 deletions(-)
  delete mode 100644 specs/posix/system_controls.table
+ delete mode 100644 tests/integration/tables/system_controls.cpp
 
 diff --git a/osquery/tables/system/CMakeLists.txt b/osquery/tables/system/CMakeLists.txt
 --- a/osquery/tables/system/CMakeLists.txt
@@ -38,7 +41,7 @@ diff --git a/osquery/tables/system/CMakeLists.txt b/osquery/tables/system/CMakeL
        darwin/system_extensions.mm
        darwin/system_info.cpp
        darwin/time_machine.cpp
-@@ -314,7 +311,6 @@ function(generateOsqueryTablesSystemSystemtable)
+@@ -326,7 +323,6 @@ function(generateOsqueryTablesSystemSystemtable)
        posix/shell_history.h
        posix/ssh_keys.h
        posix/sudoers.h
@@ -46,9 +49,19 @@ diff --git a/osquery/tables/system/CMakeLists.txt b/osquery/tables/system/CMakeL
        posix/last.h
        posix/openssl_utils.h
        posix/authorized_keys.h
+diff --git a/specs/CMakeLists.txt b/specs/CMakeLists.txt
+--- a/specs/CMakeLists.txt
++++ b/specs/CMakeLists.txt
+@@ -246,7 +246,6 @@ function(generateNativeTables)
+     "posix/socket_events.table:linux,macos"
+     "posix/sudoers.table:linux,macos,freebsd"
+     "posix/suid_bin.table:linux,macos,freebsd"
+-    "posix/system_controls.table:linux,macos,freebsd"
+     "posix/ulimit_info.table:linux,macos,freebsd"
+     "posix/usb_devices.table:linux,macos"
+     "posix/user_events.table:linux,macos,freebsd"
 diff --git a/specs/posix/system_controls.table b/specs/posix/system_controls.table
 deleted file mode 100644
-index 60636e3fd..000000000
 --- a/specs/posix/system_controls.table
 +++ /dev/null
 @@ -1,21 +0,0 @@
@@ -73,6 +86,72 @@ index 60636e3fd..000000000
 -    "/lib/sysctl.d/",
 -    "/sys"
 -])
+diff --git a/tests/integration/tables/system_controls.cpp b/tests/integration/tables/system_controls.cpp
+deleted file mode 100644
+--- a/tests/integration/tables/system_controls.cpp
++++ /dev/null
+@@ -1,61 +0,0 @@
+-/**
+- * Copyright (c) 2014-present, The osquery authors
+- *
+- * This source code is licensed as defined by the LICENSE file found in the
+- * root directory of this source tree.
+- *
+- * SPDX-License-Identifier: (Apache-2.0 OR GPL-2.0-only)
+- */
+-
+-// Sanity check integration test for system_controls
+-// Spec file: specs/posix/system_controls.table
+-
+-#include <osquery/tests/integration/tables/helper.h>
+-
+-namespace osquery {
+-namespace table_tests {
+-namespace {
+-
+-class SystemControlsTest : public testing::Test {
+- protected:
+-  void SetUp() override {
+-    setUpEnvironment();
+-  }
+-};
+-
+-TEST_F(SystemControlsTest, test_sanity) {
+-  auto const rows = execute_query("select * from system_controls");
+-  auto const row_map = ValidationMap{
+-      {"name", NonEmptyString},
+-      {"oid", NormalType},
+-      {"subsystem",
+-       SpecificValuesCheck{"",
+-                           "abi",
+-                           "debug",
+-                           "dev",
+-                           "fs",
+-                           "fscache",
+-                           "hw",
+-                           "kern",
+-                           "kernel",
+-                           "machdep",
+-                           "net",
+-                           "sunrpc",
+-                           "user",
+-                           "vfs",
+-                           "vm"}},
+-      {"current_value", NormalType},
+-      {"config_value", NormalType},
+-      {"type",
+-       SpecificValuesCheck{
+-           "", "node", "int", "string", "quad", "opaque", "struct"}},
+-#ifdef __APPLE__
+-      {"field_name", NormalType},
+-#endif
+-  };
+-  validate_rows(rows, row_map);
+-}
+-
+-} // namespace
+-} // namespace table_tests
+-} // namespace osquery
 -- 
 2.38.1
 
