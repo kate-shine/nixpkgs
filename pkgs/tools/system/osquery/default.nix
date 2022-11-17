@@ -28,14 +28,10 @@ buildStdenv.mkDerivation rec {
   };
 
   patches = [
-    ./0001-Remove-git-reset.patch
-    ./0002-Use-locale.h-instead-of-removed-xlocale.h-header.patch
-    ./0003-Remove-circular-definition-of-AUDIT_FILTER_EXCLUDE.patch
-    ./0004-Remove-include-of-random-shuffle-header.patch
-    ./0006-Add-include-of-condition_variable.patch
-    ./0007-Add-include-of-iomanip.patch
-    ./0008-Add-include-of-cstring.patch
-    ./0010-Remove-sysctl_utils-and-system_controls.patch
+    ./Remove-git-reset.patch
+    ./Use-locale.h-instead-of-removed-xlocale.h-header.patch
+    ./Remove-circular-definition-of-AUDIT_FILTER_EXCLUDE.patch
+    ./Remove-system-controls-table.patch
   ];
 
   nativeBuildInputs = [

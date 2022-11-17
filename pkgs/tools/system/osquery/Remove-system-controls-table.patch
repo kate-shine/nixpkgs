@@ -1,0 +1,78 @@
+From: Jack Baldry <jack.baldry@grafana.com>
+Date: Wed, 16 Nov 2022 22:00:06 -0400
+Subject: [PATCH] Remove system controls table
+
+Relies on <sys/sysctl.h> which is not present in glibc since 2.32.
+
+Signed-off-by: Jack Baldry <jack.baldry@grafana.com>
+---
+ osquery/tables/system/CMakeLists.txt |  4 ----
+ specs/posix/system_controls.table    | 21 ---------------------
+ 2 files changed, 25 deletions(-)
+ delete mode 100644 specs/posix/system_controls.table
+
+diff --git a/osquery/tables/system/CMakeLists.txt b/osquery/tables/system/CMakeLists.txt
+--- a/osquery/tables/system/CMakeLists.txt
++++ b/osquery/tables/system/CMakeLists.txt
+@@ -43,7 +43,6 @@ function(generateOsqueryTablesSystemSystemtable)
+       posix/smbios_utils.cpp
+       posix/sudoers.cpp
+       posix/suid_bin.cpp
+-      posix/system_controls.cpp
+       posix/ulimit_info.cpp
+     )
+   endif()
+@@ -82,7 +81,6 @@ function(generateOsqueryTablesSystemSystemtable)
+       linux/shared_memory.cpp
+       linux/smbios_tables.cpp
+       linux/startup_items.cpp
+-      linux/sysctl_utils.cpp
+       linux/system_info.cpp
+       linux/usb_devices.cpp
+       linux/user_groups.cpp
+@@ -156,7 +154,6 @@ function(generateOsqueryTablesSystemSystemtable)
+       darwin/smbios_tables.cpp
+       darwin/smc_keys.cpp
+       darwin/startup_items.cpp
+-      darwin/sysctl_utils.cpp
+       darwin/system_extensions.mm
+       darwin/system_info.cpp
+       darwin/time_machine.cpp
+@@ -314,7 +311,6 @@ function(generateOsqueryTablesSystemSystemtable)
+       posix/shell_history.h
+       posix/ssh_keys.h
+       posix/sudoers.h
+-      posix/sysctl_utils.h
+       posix/last.h
+       posix/openssl_utils.h
+       posix/authorized_keys.h
+diff --git a/specs/posix/system_controls.table b/specs/posix/system_controls.table
+deleted file mode 100644
+index 60636e3fd..000000000
+--- a/specs/posix/system_controls.table
++++ /dev/null
+@@ -1,21 +0,0 @@
+-table_name("system_controls")
+-description("sysctl names, values, and settings information.")
+-schema([
+-    Column("name", TEXT, "Full sysctl MIB name", index=True),
+-    Column("oid", TEXT, "Control MIB", additional=True),
+-    Column("subsystem", TEXT, "Subsystem ID, control type", additional=True),
+-    Column("current_value", TEXT, "Value of setting"),
+-    Column("config_value", TEXT, "The MIB value set in /etc/sysctl.conf"),
+-    Column("type", TEXT, "Data type"),
+-])
+-extended_schema(DARWIN, [
+-    Column("field_name", TEXT, "Specific attribute of opaque type"),
+-])
+-
+-implementation("system_controls@genSystemControls")
+-fuzz_paths([
+-    "/run/sysctl.d/",
+-    "/usr/lib/sysctl.d/",
+-    "/lib/sysctl.d/",
+-    "/sys"
+-])
+-- 
+2.38.1
+
