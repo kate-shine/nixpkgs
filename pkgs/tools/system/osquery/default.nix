@@ -67,6 +67,8 @@ buildStdenv.mkDerivation rec {
     patchelf --set-rpath "${lib.makeLibraryPath buildInputs }:$(patchelf --print-rpath $out/bin/osqueryd)" "$out/bin/osqueryd"
   '';
 
+  passthru.tests.osquery = nixosTests.osquery;
+
   meta = with lib; {
     description = "SQL powered operating system instrumentation, monitoring, and analytics";
     homepage = "https://osquery.io";
