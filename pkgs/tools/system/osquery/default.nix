@@ -34,6 +34,10 @@ buildStdenv.mkDerivation rec {
     ./Remove-system-controls-table.patch
   ];
 
+
+  buildInputs = [
+    llvmPackages.libunwind
+  ];
   nativeBuildInputs = [
     # > Git (>= 2.14.0), CMake (>= 3.21.4), Python 3 are required to build.
     # > The rest of the dependencies are downloaded by CMake.
@@ -58,6 +62,10 @@ buildStdenv.mkDerivation rec {
     "-DOSQUERY_VERSION=${version}"
     "-DOSQUERY_OPENSSL_ARCHIVE_PATH=${opensslArchive}"
   ];
+
+  postFixup = ''
+    patchelf --set-rpath "${lib.makeLibraryPath buildInputs }:$(patchelf --print-rpath $out/bin/osqueryd)" "$out/bin/osqueryd"
+  '';
 
   meta = with lib; {
     description = "SQL powered operating system instrumentation, monitoring, and analytics";
