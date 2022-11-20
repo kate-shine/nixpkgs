@@ -8,32 +8,32 @@ let
 in
 {
   options.services.osquery = {
-    enable = mkEnableOption "osquery";
+    enable = mkEnableOption (mdDoc "osqueryd daemon");
 
     databasePath = mkOption {
       default = "/var/osquery/osquery.db";
-      description = "Path used for the database file.";
+      description = mdDoc "Path used for the database file.";
       type = types.path;
     };
     loggerPath = mkOption {
       default = "/var/log/osquery";
-      description = "Base directory used for filesystem logging.";
+      description = mdDoc "Base directory used for filesystem logging.";
       type = types.path;
     };
     pidfile = mkOption {
       default = "/var/osquery/osqueryd.pidfile";
-      description = "Path used for the pid file.";
+      description = mdDoc "Path used for the pid file.";
       type = types.path;
     };
     utc = mkOption {
       default = true;
-      description = "Attempt to convert all UNIX calendar times to UTC.";
+      description = mdDoc "Attempt to convert all UNIX calendar times to UTC.";
       type = types.bool;
     };
 
     extraConfig = mkOption {
       default = { };
-      description = "Extra configuration to be recursively merged into the JSON configuration file.";
+      description = mdDoc "Extra configuration to be recursively merged into the JSON configuration file.";
       type = types.attrs // {
         merge = loc: foldl' (res: def: recursiveUpdate res def.value) { };
       };
