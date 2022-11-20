@@ -5,67 +5,67 @@ with lib;
 
 let
   cfg = config.services.osquery;
+  runtimeValue = flag: default:
+    cfg.config.options.${flag}
+      or cfg.flags.${flag}
+      or default;
 in
 {
   options.services.osquery = {
     enable = mkEnableOption (mdDoc "osqueryd daemon");
 
-    databasePath = mkOption {
-      default = "/var/osquery/osquery.db";
-      description = mdDoc "Path used for the database file.";
-      type = types.path;
-    };
-    loggerPath = mkOption {
-      default = "/var/log/osquery";
-      description = mdDoc "Base directory used for filesystem logging.";
-      type = types.path;
-    };
-    pidfile = mkOption {
-      default = "/var/osquery/osqueryd.pidfile";
-      description = mdDoc "Path used for the pid file.";
-      type = types.path;
-    };
-    utc = mkOption {
-      default = true;
-      description = mdDoc "Attempt to convert all UNIX calendar times to UTC.";
-      type = types.bool;
+    config = mkOption {
+      default = { };
+      description = mdDoc ''
+        Configuration to be written to the osqueryd JSON configuration file.
+        To understand the configuration format, refer to https://osquery.readthedocs.io/en/stable/deployment/configuration/#configuration-components.
+      '';
+      example = {
+        options.utc = false;
+      };
+      type = types.attrs;
     };
 
-    extraConfig = mkOption {
+    flagfile = mkOption {
+      default = "/etc/osquery/osquery.flags";
+      description = mdDoc ''
+        Path to the flagfile used to provide CLI flags to osqueryd.
+        For more information, refer to https://osquery.readthedocs.io/en/stable/installation/cli-flags/#flagfile.
+      '';
+      type = types.path;
+    };
+    flags = mkOption {
       default = { };
-      description = mdDoc "Extra configuration to be recursively merged into the JSON configuration file.";
-      type = types.attrs // {
-        merge = loc: foldl' (res: def: recursiveUpdate res def.value) { };
+      description = mdDoc ''
+        Attribute set of flag names and values to be written to the osqueryd flagfile.
+        For more information, refer to https://osquery.readthedocs.io/en/stable/installation/cli-flags.
+      '';
+      example = {
+        config_refresh = "10";
       };
+      type = types.attrsOf types.str;
     };
   };
 
   config = mkIf cfg.enable {
-    environment.etc."osquery/osquery.conf".text = toJSON (
-      recursiveUpdate
-        {
-          options = {
-            config_plugin = "filesystem";
-            database_path = cfg.databasePath;
-            logger_plugin = "filesystem";
-            logger_path = cfg.loggerPath;
-            utc = cfg.utc;
-          };
-        }
-        cfg.extraConfig
-    );
+    environment.etc = {
+      "osquery/osquery.conf".text = toJSON cfg.config;
+      "osquery/osquery.flags".text = concatStringsSep "\n" (mapAttrsToList (name: value: "--${name}=${value}") cfg.flags);
+    };
     environment.systemPackages = [ pkgs.osquery ];
     systemd.services.osqueryd = {
       after = [ "network.target" "syslog.service" ];
       description = "The osquery daemon";
-      path = [ pkgs.osquery ];
       preStart = ''
-        mkdir -p ${escapeShellArg cfg.loggerPath}
-        mkdir -p "$(dirname ${escapeShellArg cfg.pidfile})"
-        mkdir -p "$(dirname ${escapeShellArg cfg.databasePath})"
+        mkdir -p $(dirname ${escapeShellArg cfg.flagfile})
+
+        mkdir -p ${escapeShellArg (runtimeValue "logger_path" "/var/log/osquery") }
+
+        mkdir -p $(dirname ${escapeShellArg (runtimeValue "database_path" "/var/osquery/osquery.db")})
+        mkdir -p $(dirname ${escapeShellArg (runtimeValue "pidfile" "/var/osquery/osqueryd.pidfile")})
       '';
       serviceConfig = {
-        ExecStart = "${pkgs.osquery}/bin/osqueryd";
+        ExecStart = "${pkgs.osquery}/bin/osqueryd --flagfile ${escapeShellArg cfg.flagfile}";
         KillMode = "process";
         KillSignal = "SIGTERM";
         Restart = "on-failure";
