@@ -31,6 +31,7 @@ buildStdenv.mkDerivation rec {
     ./Remove-git-reset.patch
     ./Use-locale.h-instead-of-removed-xlocale.h-header.patch
     ./Remove-circular-definition-of-AUDIT_FILTER_EXCLUDE.patch
+    # For current state of compilation against glibc in the clangWithLLVM toolchain, refer to the upstream issue in https://github.com/osquery/osquery/issues/7823.
     ./Remove-system-controls-table.patch
   ];
 
@@ -70,7 +71,7 @@ buildStdenv.mkDerivation rec {
   passthru.tests.osquery = nixosTests.osquery;
 
   meta = with lib; {
-    description = "SQL powered operating system instrumentation, monitoring, and analytics";
+    description = "SQL powered operating system instrumentation, monitoring, and analytics. The system controls table is not included as it does not presently compile with the Nixpkgs toolchain. For more information, refer to https://github.com/osquery/osquery/issues/7823";
     homepage = "https://osquery.io";
     license = licenses.bsd3;
     platforms = platforms.linux;
