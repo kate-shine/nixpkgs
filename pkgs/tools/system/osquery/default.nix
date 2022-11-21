@@ -5,7 +5,7 @@ let
   buildStdenv = overrideCC stdenv llvmPackages.clangUseLLVM;
   opensslArchive =
     let
-      # https://github.com/osquery/osquery/blob/master/libraries/cmake/formula/openssl/CMakeLists.txt#L3-L4
+      # https://github.com/osquery/osquery/blob/877d5e69ab97e15800b5c5128b3de2cf6f322942/libraries/cmake/formula/openssl/CMakeLists.txt#L3-L4.
       version = "1.1.1q";
       sha256 = "d7939ce614029cdff0b6c20f0e2e5703158a489a72b2507b8bd51bf8c8fd10ca";
     in
@@ -46,7 +46,7 @@ buildStdenv.mkDerivation rec {
     git
     python3
 
-    # https://github.com/osquery/osquery/blob/master/libraries/cmake/formula/openssl/CMakeLists.txt#L94
+    # https://github.com/osquery/osquery/blob/877d5e69ab97e15800b5c5128b3de2cf6f322942/libraries/cmake/formula/openssl/CMakeLists.txt#L94
     perl
   ];
 
