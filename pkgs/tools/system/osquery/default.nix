@@ -56,6 +56,7 @@ buildStdenv.mkDerivation rec {
     substituteInPlace cmake/install_directives.cmake --replace "/control" "control"
   '';
 
+  # For explanation of these deletions, refer to the ./Use-locale.h-instead-of-removed-xlocale.h-header.patch file.
   preConfigure = ''
     find libraries/cmake/source -name 'config.h' -exec sed -i '/#define HAVE_XLOCALE_H 1/d' {} \;
   '';
