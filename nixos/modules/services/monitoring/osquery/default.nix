@@ -31,7 +31,26 @@ in
       example = {
         config_refresh = "10";
       };
-      type = types.attrsOf types.str;
+      type = with types; submodule {
+        freeformType = attrsOf str;
+        options = {
+          database_path = mkOption {
+            default = "/var/osquery/osquery.db";
+            description = mdDoc "Path used for the database file.";
+            type = path;
+          };
+          logger_path = mkOption {
+            default = "/var/log/osquery";
+            description = mdDoc "Base directory used for logging.";
+            type = path;
+          };
+          pidfile = mkOption {
+            default = "/var/osquery/osqueryd.pidfile";
+            description = "Path used for pidfile.";
+            type = path;
+          };
+        };
+      };
     };
   };
 
@@ -40,13 +59,12 @@ in
     systemd.services.osqueryd = {
       after = [ "network.target" "syslog.service" ];
       description = "The osquery daemon";
-      preStart =
-        if flags.usingFilesystemConfigPlugin then ''
-          mkdir -p ${escapeShellArg (flags.runtimeValue "logger_path" "/var/log/osquery") }
+      preStart = ''
+        mkdir -p ${escapeShellArg cfg.flags.logger_path}
 
-          mkdir -p $(dirname ${escapeShellArg (flags.runtimeValue "database_path" "/var/osquery/osquery.db")})
-          mkdir -p $(dirname ${escapeShellArg (flags.runtimeValue "pidfile" "/var/osquery/osqueryd.pidfile")})
-        '' else "";
+        mkdir -p $(dirname ${escapeShellArg cfg.flags.database_path})
+        mkdir -p $(dirname ${escapeShellArg cfg.flags.pidfile})
+      '';
       serviceConfig = {
         ExecStart = "${pkgs.osquery}/bin/osqueryd --flagfile ${flags.flagfile}";
         KillMode = "process";
