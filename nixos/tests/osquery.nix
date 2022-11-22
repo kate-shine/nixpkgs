@@ -1,8 +1,7 @@
-import ./make-test-python.nix ({ lib, ... }:
+import ./make-test-python.nix ({ lib, pkgs, ... }:
 
 with lib;
-let flagfile = "/etc/osquery/osquery.flags";
-in
+
 {
   name = "osquery";
   meta = with maintainers; {
@@ -17,7 +16,6 @@ in
         nullvalue = "NULL";
         utc = false;
       };
-      inherit flagfile;
       flags = {
         config_refresh = "10";
         nullvalue = "IGNORED";
@@ -25,22 +23,25 @@ in
     };
   };
 
-  testScript =
+  testScript = { nodes, ... }:
+    let
+      cfg = nodes.machine.config.services.osquery;
+      flags = import ../modules/services/monitoring/osquery/flags.nix { inherit cfg lib pkgs; };
+    in
     ''
       machine.start()
       machine.wait_for_unit("osqueryd.service")
 
       # osqueryd was able to query information about the host.
-      machine.succeed("echo 'SELECT address FROM etc_hosts LIMIT 1;' | osqueryi --flagfile=${flagfile} | tee /dev/console | grep -q '127.0.0.1'")
+      machine.succeed("echo 'SELECT address FROM etc_hosts LIMIT 1;' | osqueryi --flagfile ${flags.flagfile} | tee /dev/console | grep -q '127.0.0.1'")
 
       # osquery binaries respect configuration from the Nix config option.
-      machine.succeed("echo 'SELECT value FROM osquery_flags WHERE name = \"utc\";' | osqueryi --flagfile=${flagfile} | tee /dev/console | grep -q false")
+      machine.succeed("echo 'SELECT value FROM osquery_flags WHERE name = \"utc\";' | osqueryi --flagfile ${flags.flagfile} | tee /dev/console | grep -q false")
 
       # osquery binaries respect configuration from the Nix flags option.
-      machine.succeed("echo 'SELECT value FROM osquery_flags WHERE name = \"config_refresh\";' | osqueryi --flagfile=${flagfile} | tee /dev/console | grep -q 10")
+      machine.succeed("echo 'SELECT value FROM osquery_flags WHERE name = \"config_refresh\";' | osqueryi --flagfile ${flags.flagfile} | tee /dev/console | grep -q 10")
 
       # Demonstrate that osquery binaries prefer configuration file options over CLI flags.
-      machine.succeed("echo 'SELECT value FROM osquery_flags WHERE name = \"nullvalue\";' | osqueryi --flagfile=${flagfile} | tee /dev/console | grep -q NULL")
-
+      machine.succeed("echo 'SELECT value FROM osquery_flags WHERE name = \"nullvalue\";' | osqueryi --flagfile ${flags.flagfile} | tee /dev/console | grep -q NULL")
     '';
 })
