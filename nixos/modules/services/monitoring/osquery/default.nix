@@ -10,7 +10,7 @@ in
   options.services.osquery = {
     enable = mkEnableOption (mdDoc "osqueryd daemon");
 
-    config = mkOption {
+    settings = mkOption {
       default = { };
       description = mdDoc ''
         Configuration to be written to the osqueryd JSON configuration file.

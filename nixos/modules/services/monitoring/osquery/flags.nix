@@ -8,7 +8,7 @@ rec {
   conf =
     if usingFilesystemConfigPlugin then
       pkgs.writeText "osquery.conf"
-        (toJSON cfg.config)
+        (toJSON cfg.settings)
     else null;
 
   # flagfile is the file containing osquery command line flags to be provided to the application using the special --flagfile option.

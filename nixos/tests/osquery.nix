@@ -18,7 +18,7 @@ in
     services.osquery = {
       enable = true;
 
-      config.options = { inherit nullvalue utc; };
+      settings.options = { inherit nullvalue utc; };
       flags = {
         inherit config_refresh logger_path;
         nullvalue = "IGNORED";
