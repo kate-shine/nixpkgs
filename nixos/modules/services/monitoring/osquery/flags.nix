@@ -18,14 +18,14 @@ rec {
         # Use the conf derivation if not otherwise specified.
         ({ config_path = conf; } // cfg.flags)));
 
-  # runtimeValue etermines the runtime value for an osquery flag from the configuration hierarchy including the filesystem configuration file.
-  # This is only useful if the --config_plugin=filesystem.
+  # runtimeValue determines the runtime value for an osquery flag from the configuration hierarchy including the filesystem configuration file.
+  # This is only useful if --config_plugin=filesystem.
   runtimeValue = flag: default:
     cfg.config.options.${flag}
       or (runtimeValueIgnoringConf flag default);
 
-  # runtimeValueIgnoringConf determines the runtime value for an osquery from the configuration hierarchy ignoring the filesystem configuration file.
-  # Despite not using the filesystem configuration, this function is only valid for CLI only flags or if the --config_plugin=filesystem.
+  # runtimeValueIgnoringConf determines the runtime value for an osquery flag from the configuration hierarchy ignoring the filesystem configuration file.
+  # Despite not using the filesystem configuration, this function is only valid for CLI only flags or if --config_plugin=filesystem.
   # It cannot see into other flag configuration from other config plugins which might override this value.
   runtimeValueIgnoringConf = flag: default:
     cfg.flags.${flag}
