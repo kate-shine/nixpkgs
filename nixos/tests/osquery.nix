@@ -47,7 +47,8 @@ in
       # osquery binaries respect configuration from the Nix flags option.
       machine.succeed("echo 'SELECT value FROM osquery_flags WHERE name = \"config_refresh\";' | osqueryi --flagfile ${flags.flagfile} | tee /dev/console | grep -q ${config_refresh}")
 
-      # Demonstrate that osquery binaries prefer configuration file options over CLI flags.
+      # Demonstrate that osquery binaries prefer configuration plugin options over CLI flags.
+      # https://osquery.readthedocs.io/en/latest/deployment/configuration/#options.
       machine.succeed("echo 'SELECT value FROM osquery_flags WHERE name = \"nullvalue\";' | osqueryi --flagfile ${flags.flagfile} | tee /dev/console | grep -q ${nullvalue}")
 
       # Module creates directories for default database_path and pidfile flag values.
