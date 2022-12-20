@@ -46,7 +46,7 @@ in
           };
           pidfile = mkOption {
             default = "/var/osquery/osqueryd.pidfile";
-            description = "Path used for pidfile.";
+            description = mdDoc "Path used for pidfile.";
             type = path;
           };
         };
