@@ -70,7 +70,7 @@ buildStdenv.mkDerivation rec {
   ];
 
   postFixup = ''
-    patchelf --set-rpath "${lib.makeLibraryPath buildInputs }:$(patchelf --print-rpath $out/bin/osqueryd)" "$out/bin/osqueryd"
+    patchelf --set-rpath "${lib.makeLibraryPath buildInputs}:$(patchelf --print-rpath $out/bin/osqueryd)" "$out/bin/osqueryd"
   '';
 
   passthru.tests.osquery = nixosTests.osquery;
