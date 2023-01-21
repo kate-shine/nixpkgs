@@ -1,6 +1,15 @@
-{ pkgs }:
+{ lib
+, cmake
+, fetchFromGitHub
+, git
+, llvmPackages
+, nixosTests
+, overrideCC
+, perl
+, python3
+, stdenv
+}:
 
-with pkgs;
 let
   buildStdenv = overrideCC stdenv llvmPackages.clangUseLLVM;
   opensslArchive =
@@ -9,7 +18,7 @@ let
       version = "1.1.1q";
       sha256 = "d7939ce614029cdff0b6c20f0e2e5703158a489a72b2507b8bd51bf8c8fd10ca";
     in
-    fetchurl {
+    builtins.fetchurl {
       inherit sha256;
       url = "https://www.openssl.org/source/openssl-${version}.tar.gz";
     };
