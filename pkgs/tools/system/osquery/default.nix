@@ -49,15 +49,10 @@ buildStdenv.mkDerivation rec {
     llvmPackages.libunwind
   ];
   nativeBuildInputs = [
-    # > Git (>= 2.14.0), CMake (>= 3.21.4), Python 3 are required to build.
-    # > The rest of the dependencies are downloaded by CMake.
-    # https://osquery.readthedocs.io/en/latest/development/building/
     cmake
     git
-    python3
-
-    # https://github.com/osquery/osquery/blob/877d5e69ab97e15800b5c5128b3de2cf6f322942/libraries/cmake/formula/openssl/CMakeLists.txt#L94
     perl
+    python3
   ];
 
   postPatch = ''
