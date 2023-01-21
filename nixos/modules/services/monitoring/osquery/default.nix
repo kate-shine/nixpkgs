@@ -4,6 +4,8 @@ with builtins;
 with lib;
 let
   cfg = config.services.osquery;
+  logsDirectoryPrefix = "/var/log/";
+  stateDirectoryPrefix = "/var/lib/";
   flags = import ./flags.nix { inherit cfg lib pkgs; };
 in
 {
@@ -31,26 +33,38 @@ in
       example = {
         config_refresh = "10";
       };
-      type = with types; submodule {
-        freeformType = attrsOf str;
-        options = {
-          database_path = mkOption {
-            default = "/var/osquery/osquery.db";
-            description = mdDoc "Path used for the database file.";
-            type = path;
+      type = with types;
+        let
+          pathWithPrefix = prefix: mkOptionType {
+            name = "path with prefix";
+            description = "path with prefix \"${prefix}\"";
+            descriptionClass = "noun";
+            check = with (lib.strings);
+              x: path.check x && hasPrefix prefix (toString x);
+            merge = mergeEqualOption;
           };
-          logger_path = mkOption {
-            default = "/var/log/osquery";
-            description = mdDoc "Base directory used for logging.";
-            type = path;
-          };
-          pidfile = mkOption {
-            default = "/var/osquery/osqueryd.pidfile";
-            description = mdDoc "Path used for pidfile.";
-            type = path;
+        in
+        submodule {
+          freeformType = attrsOf str;
+          options = {
+            database_path = mkOption {
+              default = stateDirectoryPrefix + "osquery/osquery.db";
+              description = mdDoc "Path used for the database file.";
+              type = pathWithPrefix stateDirectoryPrefix;
+            };
+            logger_path = mkOption {
+              default = logsDirectoryPrefix + "osquery";
+              description = mdDoc "Base directory used for logging.";
+              # Systemd sytem unit LogsDirectory starts with /var/log/.
+              type = pathWithPrefix logsDirectoryPrefix;
+            };
+            pidfile = mkOption {
+              default = "/run/osquery/osqueryd.pidfile";
+              description = mdDoc "Path used for pidfile.";
+              type = pathWithPrefix "/run/";
+            };
           };
         };
-      };
     };
   };
 
@@ -60,13 +74,23 @@ in
       after = [ "network.target" "syslog.service" ];
       description = "The osquery daemon";
       preStart = ''
-        mkdir -p ${escapeShellArg cfg.flags.logger_path}
-
-        mkdir -p $(dirname ${escapeShellArg cfg.flags.database_path})
         mkdir -p $(dirname ${escapeShellArg cfg.flags.pidfile})
       '';
-      serviceConfig = {
+      serviceConfig = with lib.strings; with lib.lists; {
         ExecStart = "${pkgs.osquery}/bin/osqueryd --flagfile ${flags.flagfile}";
+        PIDFile = cfg.flags.pidfile;
+
+        LogsDirectory = [ (removePrefix logsDirectoryPrefix cfg.flags.logger_path) ];
+        StateDirectory = [
+          (
+            let
+              directory = concatStringsSep "/"
+                (init (splitString "/" (normalizePath cfg.flags.database_path)));
+            in
+            (removePrefix stateDirectoryPrefix directory)
+          )
+        ];
+
         KillMode = "process";
         KillSignal = "SIGTERM";
         Restart = "on-failure";

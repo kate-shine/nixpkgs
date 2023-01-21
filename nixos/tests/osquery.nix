@@ -4,7 +4,7 @@ with lib;
 
 let
   config_refresh = "10";
-  logger_path = "/var/other/log/path";
+  logger_path = "/var/log/other/path";
   nullvalue = "NULL";
   utc = false;
 in
