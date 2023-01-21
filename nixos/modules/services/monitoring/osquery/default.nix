@@ -91,8 +91,6 @@ in
           )
         ];
 
-        KillMode = "process";
-        KillSignal = "SIGTERM";
         Restart = "on-failure";
         TimeoutStartSec = "infinity";
       };
