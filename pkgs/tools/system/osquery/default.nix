@@ -60,8 +60,7 @@ buildStdenv.mkDerivation rec {
     perl
   ];
 
-  # Fix absolute packaging paths.
-  prePatch = ''
+  postPatch = ''
     substituteInPlace cmake/install_directives.cmake --replace "/control" "control"
   '';
 
