@@ -77,6 +77,6 @@ buildStdenv.mkDerivation rec {
     homepage = "https://osquery.io";
     license = licenses.bsd3;
     platforms = platforms.linux;
-    maintainers = with maintainers; [ jdbaldry ];
+    maintainers = with maintainers; [ jdbaldry znewman01 ];
   };
 }

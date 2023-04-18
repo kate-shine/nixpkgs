@@ -6,7 +6,7 @@ in
 {
   name = "osquery";
   meta = with maintainers; {
-    maintainers = [ jdbaldry ];
+    maintainers = [ jdbaldry znewman01 ];
   };
 
   nodes.machine = { config, pkgs, ... }: {
