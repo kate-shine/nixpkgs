@@ -25,7 +25,7 @@ let
 in
 buildStdenv.mkDerivation rec {
   pname = "osquery";
-  version = "5.5.1";
+  version = "5.8.2";
 
   src = fetchFromGitHub {
     owner = pname;
@@ -47,12 +47,14 @@ buildStdenv.mkDerivation rec {
 
   buildInputs = [
     llvmPackages.libunwind
+    libarchive
   ];
   nativeBuildInputs = [
     cmake
     git
     perl
     python3
+    libarchive
   ];
 
   postPatch = ''
